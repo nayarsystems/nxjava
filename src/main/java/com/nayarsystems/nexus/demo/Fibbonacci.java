@@ -26,7 +26,7 @@ public class Fibbonacci {
                 }
             });
 
-            client.pushTask("demo.echo", ImmutableMap.of("message", "Hello Nexus!"), null, (response) -> {
+            client.pushTask("demo.echo", ImmutableMap.of("message", "Hello Nexus!"), null, null, null, null, (response) -> {
                 System.out.println("Response received: " + response.getResult());
                 client.close();
             });

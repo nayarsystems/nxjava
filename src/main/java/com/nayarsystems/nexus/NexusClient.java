@@ -71,6 +71,11 @@ public class NexusClient {
                     (String)result.get("method"),
                     (JSONObject)result.get("params")
             );
+            task.setPrio((Long)result.get("prio"));
+            task.setDetach((Boolean)result.get("detach"));
+            task.setUser((String)result.get("user"));
+            task.setTags((JSONObject)result.get("tags"));
+
             cb.handle(task);
         });
     }
@@ -108,22 +113,19 @@ public class NexusClient {
     }
 
     public void pullTask(String prefix, Integer timeout, NexusCallbackTask cb) {
-        Map<String, Object> params = null;
+        Map<String, Object> params = ImmutableMap.of("prefix", prefix);
         if (timeout != null) {
-            params = ImmutableMap.of("prefix", prefix, "timeout", timeout);
-        } else {
-            params = ImmutableMap.of("prefix", prefix);
+            params.put("timeout", timeout);
         }
         this.exec("task.pull", params, cb);
     }
 
-    public void pushTask(String method, Map<String, Object> parameters, Integer timeout, NexusCallbackJSON cb) {
-        Map<String, Object> params = null;
-        if (timeout != null) {
-            params = ImmutableMap.of("method", method, "params", parameters, "timeout", timeout);
-        } else {
-            params = ImmutableMap.of("method", method, "params", parameters);
-        }
+    public void pushTask(String method, Map<String, Object> parameters, Integer timeout, Boolean detach, Long prio, Long ttl, NexusCallbackJSON cb) {
+        Map<String, Object> params = ImmutableMap.of("method", method, "params", parameters);
+        if (timeout != null) params.put("timeout", timeout);
+        if (detach != null) params.put("detach", detach);
+        if (prio != null) params.put("prio", prio);
+        if (ttl != null) params.put("ttl", ttl);
         this.exec("task.push", params, cb);
      }
 

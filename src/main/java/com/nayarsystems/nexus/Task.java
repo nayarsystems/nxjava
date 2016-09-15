@@ -2,15 +2,20 @@ package com.nayarsystems.nexus;
 
 import com.google.common.collect.ImmutableMap;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Task {
 
+    private final NexusClient nexusClient;
     private final String id;
     private final String path;
     private final String method;
     private final Map<String, Object> parameters;
-    private final NexusClient nexusClient;
+    private Map<String, Object> tags;
+    private Long prio;
+    private Boolean detach;
+    private String user;
 
     public Task(NexusClient nexusClient, String id, String path, String method, Map<String, Object> parameters) {
         this.nexusClient = nexusClient;
@@ -34,6 +39,38 @@ public class Task {
 
     public Map<String, Object> getParameters() {
         return parameters;
+    }
+
+    public Long getPrio() {
+        return prio;
+    }
+
+    void setPrio(Long prio) {
+        this.prio = prio;
+    }
+
+    public Boolean getDetach() {
+        return detach;
+    }
+
+    void setDetach(Boolean detach) {
+        this.detach = detach;
+    }
+
+    public Map<String, Object> getTags() {
+        return tags;
+    }
+
+    void setTags(Map<String, Object> tags) {
+        this.tags = tags;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    void setUser(String user) {
+        this.user = user;
     }
 
     public void sendResult(Object data) {
