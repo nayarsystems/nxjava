@@ -1,12 +1,8 @@
 package com.nayarsystems.nexus;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.MapMaker;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimaps;
 import com.nayarsystems.nexus.core.NexusCallbackJSON;
 import com.nayarsystems.nexus.core.NexusCallbackTask;
-import com.nayarsystems.nexus.network.NexusConnection;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2ParseException;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Request;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Response;

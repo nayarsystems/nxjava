@@ -3,7 +3,7 @@ package com.nayarsystems.nexus.demo;
 import com.google.common.collect.ImmutableMap;
 import com.nayarsystems.nexus.NexusClient;
 import com.nayarsystems.nexus.Task;
-import com.nayarsystems.nexus.network.NexusConnection;
+import com.nayarsystems.nexus.NexusConnection;
 
 import java.net.URI;
 import java.net.URISyntaxException;

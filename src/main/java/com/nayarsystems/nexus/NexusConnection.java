@@ -1,4 +1,7 @@
-package com.nayarsystems.nexus.network;
+package com.nayarsystems.nexus;
+
+import com.nayarsystems.nexus.network.MessageHandler;
+import com.nayarsystems.nexus.network.WebSocketClient;
 
 import java.net.URI;
 
