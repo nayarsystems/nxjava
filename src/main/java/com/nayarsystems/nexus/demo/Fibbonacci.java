@@ -3,13 +3,11 @@ package com.nayarsystems.nexus.demo;
 import com.google.common.collect.ImmutableMap;
 import com.nayarsystems.nexus.NexusClient;
 import com.nayarsystems.nexus.NexusError;
-import com.nayarsystems.nexus.Task;
-import com.nayarsystems.nexus.network.Connection;
+import com.nayarsystems.nexus.NexusTask;
 import net.minidev.json.JSONObject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 
 public class Fibbonacci {
 
@@ -19,12 +17,12 @@ public class Fibbonacci {
         client.login("root", "root", (x) -> {
             System.out.println("Logged in");
 
-            client.pullTask("demo", null, (Task task) -> {
+            client.pullTask("demo", null, (NexusTask nexusTask) -> {
                 System.out.println("Request received");
-                if (task.getMethod().equalsIgnoreCase("echo")) {
-                    task.sendResult(task.getParameters().get("message"));
+                if (nexusTask.getMethod().equalsIgnoreCase("echo")) {
+                    nexusTask.sendResult(nexusTask.getParameters().get("message"));
                 } else {
-                    task.sendError(NexusError.MethodNotFound, "Unknown method", null);
+                    nexusTask.sendError(NexusError.MethodNotFound, "Unknown method", null);
                 }
             });
 

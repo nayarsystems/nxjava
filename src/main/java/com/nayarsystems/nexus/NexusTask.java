@@ -3,10 +3,9 @@ package com.nayarsystems.nexus;
 import com.google.common.collect.ImmutableMap;
 import net.minidev.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.Map;
 
-public class Task {
+public class NexusTask {
 
     private final NexusClient nexusClient;
     private final String id;
@@ -18,7 +17,7 @@ public class Task {
     private Boolean detach;
     private String user;
 
-    public Task(NexusClient nexusClient, String id, String path, String method, Map<String, Object> parameters) {
+    public NexusTask(NexusClient nexusClient, String id, String path, String method, Map<String, Object> parameters) {
         this.nexusClient = nexusClient;
         this.id = id;
         this.path = path;
@@ -26,7 +25,7 @@ public class Task {
         this.parameters = parameters;
     }
 
-    public Task(NexusClient nexusClient, JSONObject result) {
+    public NexusTask(NexusClient nexusClient, JSONObject result) {
         this(
                 nexusClient,
                 (String)result.get("taskid"),

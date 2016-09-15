@@ -1,8 +1,8 @@
 package com.nayarsystems.nexus.core;
 
-import com.nayarsystems.nexus.Task;
+import com.nayarsystems.nexus.NexusTask;
 
 @FunctionalInterface
 public interface NexusCallbackTask extends NexusCallback {
-    public void handle(Task task);
+    public void handle(NexusTask nexusTask);
 }

@@ -8,7 +8,6 @@ import com.nayarsystems.nexus.network.Connection;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2ParseException;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Request;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Response;
-import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 
 import java.net.URI;
@@ -71,8 +70,8 @@ public class NexusClient {
 
                 callback = (JSONRPC2Response response) -> {
                     Object result = response.getResult();
-                    Task task = new Task(this, (JSONObject) result);
-                    ((NexusCallbackTask) cb).handle(task);
+                    NexusTask nexusTask = new NexusTask(this, (JSONObject) result);
+                    ((NexusCallbackTask) cb).handle(nexusTask);
                 };
 
             } else {
