@@ -1,14 +1,11 @@
-package com.nayarsystems.nexus;
-
-import com.nayarsystems.nexus.network.MessageHandler;
-import com.nayarsystems.nexus.network.WebSocketClient;
+package com.nayarsystems.nexus.network;
 
 import java.net.URI;
 
-public class NexusConnection {
+public class Connection {
     private WebSocketClient connection;
 
-    public NexusConnection(URI url) {
+    public Connection(URI url) {
         this.connection = new WebSocketClient(url);
     }
 

@@ -1,25 +1,30 @@
 package com.nayarsystems.nexus;
 
 import com.google.common.collect.ImmutableMap;
+import com.nayarsystems.nexus.core.NexusCallback;
 import com.nayarsystems.nexus.core.NexusCallbackJSON;
 import com.nayarsystems.nexus.core.NexusCallbackTask;
+import com.nayarsystems.nexus.network.Connection;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2ParseException;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Request;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Response;
+import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.net.URI;
+import java.util.*;
+import java.util.logging.Logger;
 
 public class NexusClient {
-    private final NexusConnection connection;
+    private final static Logger log = Logger.getLogger("nexus");
+
+    private final Connection connection;
     private final Map<String, NexusCallbackJSON> requestHandlers;
     private final Random idGenerator;
     private Thread pingThread;
 
-    public NexusClient(NexusConnection connection) {
-        this.connection = connection;
+    public NexusClient(URI url) {
+        this.connection = new Connection(url);
         this.connection.registerCallback((json) -> this.handleMessage(json));
         this.requestHandlers = new HashMap<>();
         this.idGenerator = new Random();
@@ -56,37 +61,35 @@ public class NexusClient {
         this.exec(method, parameters, (NexusCallbackJSON)null);
     }
 
-    private void exec(String method, Map<String, Object> parameters, NexusCallbackTask cb) {
-        this.exec(method, parameters, (JSONRPC2Response response) -> {
-            JSONObject result = (JSONObject) response.getResult();
+    private void exec(String method, Map<String, Object> parameters, NexusCallback cb) {
 
-            Task task = new Task(
-                    this,
-                    (String)result.get("taskid"),
-                    (String)result.get("path"),
-                    (String)result.get("method"),
-                    (JSONObject)result.get("params")
-            );
-            task.setPrio((Long)result.get("prio"));
-            task.setDetach((Boolean)result.get("detach"));
-            task.setUser((String)result.get("user"));
-            task.setTags((JSONObject)result.get("tags"));
-
-            cb.handle(task);
-        });
-    }
-
-    private void exec(String method, Map<String, Object> parameters, NexusCallbackJSON cb) {
         JSONRPC2Request request = new JSONRPC2Request(method, parameters, this.getId());
+
         if (cb != null) {
-            this.requestHandlers.put((String) request.getID(), cb);
+            NexusCallbackJSON callback = null;
+            if (!NexusCallbackJSON.class.isInstance(cb)) {
+
+                callback = (JSONRPC2Response response) -> {
+                    Object result = response.getResult();
+                    Task task = new Task(this, (JSONObject) result);
+                    ((NexusCallbackTask) cb).handle(task);
+                };
+
+            } else {
+                callback = (NexusCallbackJSON) cb;
+            }
+
+            this.requestHandlers.put((String) request.getID(), callback);
+
         }
 
         String data = request.toJSONString();
+        log.fine("JSONRPC sent: " + data);
         this.connection.send(data);
     }
 
     private void handleMessage(String jsonMessage) {
+        log.fine("JSONRPC received: " + jsonMessage);
         try {
             JSONRPC2Response response = JSONRPC2Response.parse(jsonMessage);
             String id = (String)response.getID();
@@ -125,6 +128,8 @@ public class NexusClient {
         this.exec("task.push", params, cb);
      }
 
-
+    public void taskList(String prefix, int limit, int skip, NexusCallbackJSON cb) {
+        this.exec("task.list", ImmutableMap.of("prefix", prefix, "limit", limit, "skip", skip), cb);
+    }
 }
 

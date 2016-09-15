@@ -1,6 +1,7 @@
 package com.nayarsystems.nexus;
 
 import com.google.common.collect.ImmutableMap;
+import net.minidev.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +26,20 @@ public class Task {
         this.parameters = parameters;
     }
 
+    public Task(NexusClient nexusClient, JSONObject result) {
+        this(
+                nexusClient,
+                (String)result.get("taskid"),
+                (String)result.get("path"),
+                (String)result.get("method"),
+                (JSONObject)result.get("params")
+        );
+        this.prio = (Long)result.get("prio");
+        this.detach = (Boolean)result.get("detach");
+        this.user = (String)result.get("user");
+        this.tags = (JSONObject)result.get("tags");
+    }
+
     public String getId() {
         return id;
     }
@@ -45,39 +60,33 @@ public class Task {
         return prio;
     }
 
-    void setPrio(Long prio) {
-        this.prio = prio;
-    }
-
     public Boolean getDetach() {
         return detach;
-    }
-
-    void setDetach(Boolean detach) {
-        this.detach = detach;
     }
 
     public Map<String, Object> getTags() {
         return tags;
     }
 
-    void setTags(Map<String, Object> tags) {
-        this.tags = tags;
-    }
-
     public String getUser() {
         return user;
-    }
-
-    void setUser(String user) {
-        this.user = user;
     }
 
     public void sendResult(Object data) {
         this.nexusClient.exec("task.result", ImmutableMap.of("taskid", this.id, "result", data));
     }
 
-    public void sendError(int code, String message, Object data) {
-        this.nexusClient.exec("task.error", ImmutableMap.of("taskid", this.id, "code", code, "message", message, "data", data));
+    public void sendError(NexusError error, String message, Object data) {
+        String msg = message != null ? error.getCode() + ":[" + message + "]" : null;
+
+        this.nexusClient.exec("task.error", ImmutableMap.of("taskid", this.id, "code", error.getCode(), "message", msg, "data", data));
+    }
+
+    public void accept() {
+        this.nexusClient.exec("task.result", ImmutableMap.of("taskid", this.id, "result", null));
+    }
+
+    public void reject() {
+        this.nexusClient.exec("task.reject", ImmutableMap.of("taskid", this.id));
     }
 }
