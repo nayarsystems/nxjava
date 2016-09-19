@@ -1,11 +1,13 @@
-package com.nayarsystems.nexus;
+package com.nayarsystems.nexus.core.components;
 
 import com.google.common.collect.ImmutableMap;
+import com.nayarsystems.nexus.NexusClient;
+import com.nayarsystems.nexus.NexusError;
 import net.minidev.json.JSONObject;
 
 import java.util.Map;
 
-public class NexusTask {
+public class Task {
 
     private final NexusClient nexusClient;
     private final String id;
@@ -17,7 +19,7 @@ public class NexusTask {
     private Boolean detach;
     private String user;
 
-    public NexusTask(NexusClient nexusClient, String id, String path, String method, Map<String, Object> parameters) {
+    public Task(NexusClient nexusClient, String id, String path, String method, Map<String, Object> parameters) {
         this.nexusClient = nexusClient;
         this.id = id;
         this.path = path;
@@ -25,7 +27,7 @@ public class NexusTask {
         this.parameters = parameters;
     }
 
-    public NexusTask(NexusClient nexusClient, JSONObject result) {
+    public Task(NexusClient nexusClient, JSONObject result) {
         this(
                 nexusClient,
                 (String)result.get("taskid"),

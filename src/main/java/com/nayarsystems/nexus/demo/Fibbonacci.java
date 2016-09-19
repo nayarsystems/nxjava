@@ -3,7 +3,7 @@ package com.nayarsystems.nexus.demo;
 import com.google.common.collect.ImmutableMap;
 import com.nayarsystems.nexus.NexusClient;
 import com.nayarsystems.nexus.NexusError;
-import com.nayarsystems.nexus.NexusTask;
+import com.nayarsystems.nexus.core.components.Task;
 import net.minidev.json.JSONObject;
 
 import java.net.URI;
@@ -17,20 +17,20 @@ public class Fibbonacci {
         client.login("root", "root", (x) -> {
             System.out.println("Logged in");
 
-            client.pullTask("demo", null, (NexusTask nexusTask) -> {
+            client.pullTask("demo", null, (Task task) -> {
                 System.out.println("Request received");
-                if (nexusTask.getMethod().equalsIgnoreCase("echo")) {
-                    nexusTask.sendResult(nexusTask.getParameters().get("message"));
+                if (task.getMethod().equalsIgnoreCase("echo")) {
+                    task.sendResult(task.getParameters().get("message"));
                 } else {
-                    nexusTask.sendError(NexusError.MethodNotFound, "Unknown method", null);
+                    task.sendError(NexusError.MethodNotFound, "Unknown method", null);
                 }
             });
 
             client.pushTask("demo.echo", ImmutableMap.of("message", "Hello Nexus!"), null, null, null, null, (response) -> {
-                System.out.println("Response received: " + response.getResult());
+                System.out.println("Response received: " + response);
 
                 client.taskList("demo", 0, 0, (listResponse) -> {
-                    JSONObject result = (JSONObject)listResponse.getResult();
+                    JSONObject result = (JSONObject)listResponse;
                     System.out.println("Pending push/pulls: " + result.get("pushes") + " / " + result.get("pulls"));
                 });
 

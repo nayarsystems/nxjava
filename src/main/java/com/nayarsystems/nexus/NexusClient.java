@@ -2,13 +2,14 @@ package com.nayarsystems.nexus;
 
 import com.google.common.collect.ImmutableMap;
 import com.nayarsystems.nexus.core.CoreClient;
-import com.nayarsystems.nexus.core.NexusCallbackJSON;
-import com.nayarsystems.nexus.core.NexusCallbackTask;
 import com.nayarsystems.nexus.core.actions.TaskActions;
-import com.nayarsystems.nexus.core.actions.impl.TasksActionsImpl;
+import com.nayarsystems.nexus.core.actions.impl.TaskActionsImpl;
+import com.nayarsystems.nexus.core.components.Task;
+import net.minidev.json.JSONObject;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 public class NexusClient extends CoreClient implements TaskActions {
@@ -16,12 +17,15 @@ public class NexusClient extends CoreClient implements TaskActions {
 
     private Thread pingThread;
 
-    private final TasksActionsImpl tasks;
+    private final TaskActions tasks;
+    //private final PipeActions pipes;
 
     public NexusClient(URI url) {
         super(url);
 
-        this.tasks = new TasksActionsImpl(this);
+        this.tasks = new TaskActionsImpl(this);
+        //this.pipes = new PipeActionsImpl(this);
+
 
         this.launchPing();
     }
@@ -41,7 +45,7 @@ public class NexusClient extends CoreClient implements TaskActions {
         this.pingThread.start();
     }
 
-    public void login(String user, String password, NexusCallbackJSON cb) {
+    public void login(String user, String password, Consumer<JSONObject> cb) {
         this.exec("sys.login", ImmutableMap.of("user", user, "pass", password), cb);
     }
 
@@ -55,18 +59,28 @@ public class NexusClient extends CoreClient implements TaskActions {
     }
 
     @Override
-    public void pullTask(String prefix, Integer timeout, NexusCallbackTask cb) {
+    public void pullTask(String prefix, Integer timeout, Consumer<Task> cb) {
         this.tasks.pullTask(prefix, timeout, cb);
     }
 
     @Override
-    public void pushTask(String method, Map<String, Object> parameters, Integer timeout, Boolean detach, Long prio, Long ttl, NexusCallbackJSON cb) {
+    public void pushTask(String method, Map<String, Object> parameters, Integer timeout, Boolean detach, Long prio, Long ttl, Consumer cb) {
         this.tasks.pushTask(method, parameters, timeout, detach, prio, ttl, cb);
     }
 
     @Override
-    public void taskList(String prefix, int limit, int skip, NexusCallbackJSON cb) {
+    public void taskList(String prefix, int limit, int skip, Consumer cb) {
         this.tasks.taskList(prefix, limit, skip, cb);
     }
+
+//    @Override
+//    public Pipe pipeOpen(String id) {
+//        return this.pipes.pipeOpen(id);
+//    }
+//
+//    @Override
+//    public Pipe pipeCreate(Map<String, Object> options) {
+//        return this.pipes.pipeCreate(options);
+//    }
 }
 
