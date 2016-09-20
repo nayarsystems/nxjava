@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.nayarsystems.nexus.NexusClient;
 import com.nayarsystems.nexus.core.actions.TaskActions;
 import com.nayarsystems.nexus.core.components.Task;
+import net.minidev.json.JSONObject;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -33,7 +34,7 @@ public class TaskActionsImpl implements TaskActions {
         this.client.exec("task.push", params, cb);
     }
 
-    public void taskList(String prefix, int limit, int skip, Consumer cb) {
+    public void taskList(String prefix, int limit, int skip, Consumer<JSONObject> cb) {
         this.client.exec("task.list", ImmutableMap.of("prefix", prefix, "limit", limit, "skip", skip), cb);
     }
 }

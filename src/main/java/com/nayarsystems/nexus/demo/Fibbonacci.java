@@ -20,9 +20,9 @@ public class Fibbonacci {
             client.pullTask("demo", null, (Task task) -> {
                 System.out.println("Request received");
                 if (task.getMethod().equalsIgnoreCase("echo")) {
-                    task.sendResult(task.getParameters().get("message"));
+                    task.sendResult(task.getParameters().get("message"), null);
                 } else {
-                    task.sendError(NexusError.MethodNotFound, "Unknown method", null);
+                    task.sendError(NexusError.MethodNotFound, "Unknown method", null, null);
                 }
             });
 
@@ -30,8 +30,7 @@ public class Fibbonacci {
                 System.out.println("Response received: " + response);
 
                 client.taskList("demo", 0, 0, (listResponse) -> {
-                    JSONObject result = (JSONObject)listResponse;
-                    System.out.println("Pending push/pulls: " + result.get("pushes") + " / " + result.get("pulls"));
+                    System.out.println("Pending push/pulls: " + listResponse.get("pushes") + " / " + listResponse.get("pulls"));
                 });
 
                 client.close();

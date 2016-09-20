@@ -36,10 +36,6 @@ public class CoreClient {
         return "" + id;
     }
 
-    public void exec(String method, Map<String, Object> parameters) {
-        this.exec(method, parameters, null);
-    }
-
     public void exec(String method, Map<String, Object> parameters, Consumer cb) {
 
         JSONRPC2Request request = new JSONRPC2Request(method, parameters, this.getId());

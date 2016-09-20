@@ -2,8 +2,11 @@ package com.nayarsystems.nexus;
 
 import com.google.common.collect.ImmutableMap;
 import com.nayarsystems.nexus.core.CoreClient;
+import com.nayarsystems.nexus.core.actions.PipeActions;
 import com.nayarsystems.nexus.core.actions.TaskActions;
+import com.nayarsystems.nexus.core.actions.impl.PipeActionsImpl;
 import com.nayarsystems.nexus.core.actions.impl.TaskActionsImpl;
+import com.nayarsystems.nexus.core.components.Pipe;
 import com.nayarsystems.nexus.core.components.Task;
 import net.minidev.json.JSONObject;
 
@@ -12,20 +15,19 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-public class NexusClient extends CoreClient implements TaskActions {
+public class NexusClient extends CoreClient implements TaskActions, PipeActions {
     private final static Logger log = Logger.getLogger("nexus");
 
     private Thread pingThread;
 
     private final TaskActions tasks;
-    //private final PipeActions pipes;
+    private final PipeActions pipes;
 
     public NexusClient(URI url) {
         super(url);
 
         this.tasks = new TaskActionsImpl(this);
-        //this.pipes = new PipeActionsImpl(this);
-
+        this.pipes = new PipeActionsImpl(this);
 
         this.launchPing();
     }
@@ -33,7 +35,7 @@ public class NexusClient extends CoreClient implements TaskActions {
     private void launchPing() {
         Runnable ping = () -> {
             while(true) {
-                this.exec("sys.ping", null);
+                this.exec("sys.ping", null, null);
                 try {
                     Thread.sleep(60 * 1000);
                 } catch (InterruptedException e) {
@@ -69,18 +71,18 @@ public class NexusClient extends CoreClient implements TaskActions {
     }
 
     @Override
-    public void taskList(String prefix, int limit, int skip, Consumer cb) {
+    public void taskList(String prefix, int limit, int skip, Consumer<JSONObject> cb) {
         this.tasks.taskList(prefix, limit, skip, cb);
     }
 
-//    @Override
-//    public Pipe pipeOpen(String id) {
-//        return this.pipes.pipeOpen(id);
-//    }
-//
-//    @Override
-//    public Pipe pipeCreate(Map<String, Object> options) {
-//        return this.pipes.pipeCreate(options);
-//    }
+    @Override
+    public Pipe pipeOpen(String id) {
+        return this.pipes.pipeOpen(id);
+    }
+
+    @Override
+    public void pipeCreate(Integer length, Consumer<Pipe> cb) {
+        this.pipes.pipeCreate(length, cb);
+    }
 }
 
