@@ -7,70 +7,85 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class TopicsExample {
+    static URI uri = null;
+
+    static {
+        try {
+            uri = new URI("ws://localhost");
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) throws URISyntaxException {
-        URI uri = new URI("ws://localhost");
 
-//        new Thread(() -> {
-//
-//            NexusClient client = new NexusClient(uri);
-//
-//            client.login("root", "root", (r) -> {
-//                client.pipeCreate(1, (pipe) -> {
-//                    client.topicSubscribe(pipe, "demo.topics.t1");
-//
-//                    fetchMessages(pipe, "T1", 500);
-//                });
-//            });
-//
-//        }).start();
+        Thread t1 = createConsumer("T1");
+        Thread t2 = createConsumer("T2");
+        Thread t3 = createConsumer("T3");
 
         new Thread(() -> {
 
-            NexusClient client = new NexusClient(uri);
-
-            client.login("root", "root", (r) -> {
-                client.pipeCreate(1, (pipe) -> {
-                    client.topicSubscribe(pipe, "demo.topics.t1");
-
-                    fetchMessages(pipe, "T2", 2000);
-
-                });
-            });
-
-        }).start();
-
-
-        new Thread(() -> {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
             NexusClient client = new NexusClient(uri);
 
             client.login("root", "root", (r) -> {
-                client.topicPublish("demo.topics.t1", "Hello Nexus!");
-                client.topicPublish("demo.topics.t1", "This is awesome!");
-                client.topicPublish("demo.topics.t1", "Looking forward to see you again!");
+                System.out.println("Publishing messages...");
+
+                client.topicPublish("demo.topics.test", "Hello Nexus!");
+                client.topicPublish("demo.topics.test", "This is awesome!");
+                client.topicPublish("demo.topics.test", "Looking forward to see you again!");
+
+                System.out.println("Publish done!");
+
+                try {
+                    t1.join();
+                    t2.join();
+                    t3.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } finally {
+                    client.close();
+                    System.out.println("Bye!");
+                }
+
             });
+
         }).start();
 
+    }
 
+    private static Thread createConsumer(String prefix) throws URISyntaxException {
+
+        Thread t = new Thread(() -> {
+
+            NexusClient client = new NexusClient(uri);
+
+            client.login("root", "root", (r) -> {
+                client.pipeCreate(1, (pipe) -> {
+                    System.out.println(prefix + ": Pipe created. Subscribing...");
+                    client.topicSubscribe(pipe, "demo.topics.test");
+
+                    fetchMessages(pipe, prefix, 30000);
+
+                    client.close();
+                });
+            });
+
+        });
+        t.start();
+        return t;
     }
 
     private static void fetchMessages(Pipe pipe, String prefix, int timeout) {
-        while(true) {
-            pipe.read(1, timeout, (response) -> {
-                System.out.println(prefix + ": " + response);
-            });
-            try {
-                Thread.sleep(timeout);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+        pipe.read(1, timeout, (response) -> {
+            System.out.println(prefix + ": " + response);
 
-    ;
+//            fetchMessages(pipe, prefix, timeout);
+        });
+    }
 };

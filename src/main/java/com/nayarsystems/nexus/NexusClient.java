@@ -4,8 +4,10 @@ import com.google.common.collect.ImmutableMap;
 import com.nayarsystems.nexus.core.CoreClient;
 import com.nayarsystems.nexus.core.actions.PipeActions;
 import com.nayarsystems.nexus.core.actions.TaskActions;
+import com.nayarsystems.nexus.core.actions.TopicActions;
 import com.nayarsystems.nexus.core.actions.impl.PipeActionsImpl;
 import com.nayarsystems.nexus.core.actions.impl.TaskActionsImpl;
+import com.nayarsystems.nexus.core.actions.impl.TopicActionsImpl;
 import com.nayarsystems.nexus.core.components.Pipe;
 import com.nayarsystems.nexus.core.components.Task;
 import net.minidev.json.JSONObject;
@@ -15,19 +17,20 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-public class NexusClient extends CoreClient implements TaskActions, PipeActions {
+public class NexusClient extends CoreClient implements TaskActions, PipeActions, TopicActions {
     private final static Logger log = Logger.getLogger("nexus");
-
     private Thread pingThread;
 
     private final TaskActions tasks;
     private final PipeActions pipes;
+    private final TopicActionsImpl topics;
 
     public NexusClient(URI url) {
         super(url);
 
         this.tasks = new TaskActionsImpl(this);
         this.pipes = new PipeActionsImpl(this);
+        this.topics = new TopicActionsImpl(this);
 
         this.launchPing();
     }
@@ -83,6 +86,21 @@ public class NexusClient extends CoreClient implements TaskActions, PipeActions 
     @Override
     public void pipeCreate(Integer length, Consumer<Pipe> cb) {
         this.pipes.pipeCreate(length, cb);
+    }
+
+    @Override
+    public void topicSubscribe(Pipe pipe, String topic) {
+        this.topics.topicSubscribe(pipe, topic);
+    }
+
+    @Override
+    public void topicUnsubscribe(Pipe pipe, String topic) {
+        this.topics.topicUnsubscribe(pipe, topic);
+    }
+
+    @Override
+    public void topicPublish(String topic, Object data) {
+        this.topics.topicPublish(topic, data);
     }
 }
 
