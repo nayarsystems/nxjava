@@ -9,7 +9,7 @@ import net.minidev.json.JSONObject;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class Fibbonacci {
+public class TasksExample {
 
     public static void main(String[] args) throws URISyntaxException {
         NexusClient client = new NexusClient(new URI("ws://localhost"));
@@ -17,7 +17,7 @@ public class Fibbonacci {
         client.login("root", "root", (x) -> {
             System.out.println("Logged in");
 
-            client.pullTask("demo", null, (Task task) -> {
+            client.pullTask("demo.tasks", null, (Task task) -> {
                 System.out.println("Request received");
                 if (task.getMethod().equalsIgnoreCase("echo")) {
                     task.sendResult(task.getParameters().get("message"), null);
@@ -26,7 +26,7 @@ public class Fibbonacci {
                 }
             });
 
-            client.pushTask("demo.echo", ImmutableMap.of("message", "Hello Nexus!"), null, null, null, null, (response) -> {
+            client.pushTask("demo.tasks.echo", ImmutableMap.of("message", "Hello Nexus!"), null, null, null, null, (response) -> {
                 System.out.println("Response received: " + response);
 
                 client.taskList("demo", 0, 0, (listResponse) -> {

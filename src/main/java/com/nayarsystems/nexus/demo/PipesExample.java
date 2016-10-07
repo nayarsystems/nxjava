@@ -8,7 +8,8 @@ import com.nayarsystems.nexus.core.components.Task;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class Pipes {
+public class PipesExample {
+
     public static void main(String[] args) throws URISyntaxException {
         URI uri = new URI("ws://localhost");
 
@@ -17,7 +18,7 @@ public class Pipes {
 
             client.login("root", "root", (x) -> {
 
-                client.pullTask("demo.pipe", null, (Task task) -> {
+                client.pullTask("demo.pipes", null, (Task task) -> {
                     String pipeId = (String) task.getParameters().get("pipe");
 
                     Pipe pipe = client.pipeOpen(pipeId);
@@ -51,7 +52,7 @@ public class Pipes {
                         System.out.println(data);
                     });
 
-                    client.pushTask("demo.pipe.test", ImmutableMap.of("pipe", pipe.getId()), null, null, null, null, (response) -> {
+                    client.pushTask("demo.pipes.test", ImmutableMap.of("pipe", pipe.getId()), null, null, null, null, (response) -> {
                         System.out.println(response);
 
                         pipe.close((r) -> client.close());
