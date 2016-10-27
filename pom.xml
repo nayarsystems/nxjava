@@ -16,7 +16,7 @@
         </dependency>
         <dependency>
             <groupId>com.thetransactioncompany</groupId>
-            <artifactId>jsonrpc2-base</artifactId
+            <artifactId>jsonrpc2-base</artifactId>
             <version>1.38</version>
         </dependency>
         <dependency>
