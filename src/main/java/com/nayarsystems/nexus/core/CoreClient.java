@@ -66,12 +66,10 @@ public class CoreClient {
         }
 
         String data = request.toJSONString();
-        log.fine("JSONRPC sent: " + data);
         this.connection.send(data);
     }
 
     private void handleMessage(String jsonMessage) {
-        log.fine("JSONRPC received: " + jsonMessage);
         try {
             JSONRPC2Response response = JSONRPC2Response.parse(jsonMessage);
             String id = (String)response.getID();

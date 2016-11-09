@@ -34,7 +34,7 @@ public class PipeActionsImpl implements PipeActions {
             JSONObject json = (JSONObject) response;
             String pipeId = (String) json.get("pipeid");
 
-            log.info("Pipe " + pipeId + " created");
+            log.finer("Pipe " + pipeId + " created");
             if (cb != null) {
                 cb.accept(new Pipe(client, pipeId));
             }

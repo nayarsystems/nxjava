@@ -48,7 +48,7 @@ public class PipesExample {
                 client.pipeCreate(1, (pipe) -> {
                     System.out.println("Pipe created with ID " + pipe.getId());
 
-                    pipe.read(1, 1000, (data) -> {
+                    pipe.read(1, 1, (data) -> {
                         System.out.println(data);
                     });
 

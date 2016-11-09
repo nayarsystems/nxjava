@@ -2,9 +2,11 @@ package com.nayarsystems.nexus.network;
 
 import javax.websocket.*;
 import java.net.URI;
+import java.util.logging.Logger;
 
 @ClientEndpoint
 public class WebSocketClient {
+    private static Logger log = Logger.getLogger("nexus.wsclient");
 
     Session userSession = null;
     private MessageHandler messageHandler;
@@ -41,12 +43,13 @@ public class WebSocketClient {
 
     @OnError
     public void onError(Throwable exception, Session session) {
-        System.err.println("Error for client: " + session.getId() + " " + exception.toString());
+        log.severe("Error for client: " + session.getId() + " " + exception.toString());
         exception.printStackTrace(System.err);
     }
 
     @OnMessage
     public void onMessage(String message) {
+        log.finest("<- " + message);
         if (this.messageHandler != null) {
             this.messageHandler.handleMessage(message);
         }
@@ -57,6 +60,7 @@ public class WebSocketClient {
     }
 
     public void sendMessage(String message) {
+        log.finest("-> " + message);
         this.userSession.getAsyncRemote().sendText(message);
     }
 
