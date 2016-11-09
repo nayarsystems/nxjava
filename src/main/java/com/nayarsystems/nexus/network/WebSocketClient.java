@@ -39,6 +39,12 @@ public class WebSocketClient {
         this.userSession = null;
     }
 
+    @OnError
+    public void onError(Throwable exception, Session session) {
+        System.err.println("Error for client: " + session.getId() + " " + exception.toString());
+        exception.printStackTrace(System.err);
+    }
+
     @OnMessage
     public void onMessage(String message) {
         if (this.messageHandler != null) {

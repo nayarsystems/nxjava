@@ -74,7 +74,7 @@ public class NexusClient extends CoreClient implements TaskActions, PipeActions,
     }
 
     @Override
-    public void taskList(String prefix, int limit, int skip, Consumer<JSONObject> cb) {
+    public void taskList(String prefix, int limit, int skip, Consumer cb) {
         this.tasks.taskList(prefix, limit, skip, cb);
     }
 
