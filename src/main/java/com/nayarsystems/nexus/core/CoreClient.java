@@ -3,6 +3,7 @@ package com.nayarsystems.nexus.core;
 import com.nayarsystems.nexus.NexusClient;
 import com.nayarsystems.nexus.core.components.Task;
 import com.nayarsystems.nexus.network.Connection;
+import com.thetransactioncompany.jsonrpc2.JSONRPC2Error;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2ParseException;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Request;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Response;
@@ -12,6 +13,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -36,13 +38,14 @@ public class CoreClient {
         return "" + id;
     }
 
-    public void exec(String method, Map<String, Object> parameters, Consumer cb) {
+    public void exec(String method, Map<String, Object> parameters, BiConsumer cb) {
 
         JSONRPC2Request request = new JSONRPC2Request(method, parameters, this.getId());
 
         if (cb != null) {
 
             this.requestHandlers.put((String) request.getID(), (JSONRPC2Response response) -> {
+                JSONRPC2Error error = response.getError();
                 Object result = response.getResult();
 
                 Task task = null;
@@ -57,9 +60,9 @@ public class CoreClient {
                 }
 
                 if (task != null) {
-                    ((Consumer<Task>) cb).accept(task);
+                    ((BiConsumer<Task, JSONRPC2Error>) cb).accept(task, error);
                 } else {
-                    cb.accept(result);
+                    cb.accept(result, error);
                 }
             });
 

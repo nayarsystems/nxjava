@@ -33,24 +33,30 @@ public class TopicsExample {
 
             NexusClient client = new NexusClient(uri);
 
-            client.login("root", "root", (r) -> {
-                System.out.println("Publishing messages...");
-
-                client.topicPublish("demo.topics.test", "Hello Nexus!");
-                client.topicPublish("demo.topics.test", "This is awesome!");
-                client.topicPublish("demo.topics.test", "Looking forward to see you again!");
-
-                System.out.println("Publish done!");
-
-                try {
-                    t1.join();
-                    t2.join();
-                    t3.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } finally {
+            client.login("root", "root", (r, errorLogin) -> {
+                if (errorLogin != null) {
+                    System.err.println("Error in login: " + errorLogin.toString());
                     client.close();
-                    System.out.println("Bye!");
+                } else {
+
+                    System.out.println("Publishing messages...");
+
+                    client.topicPublish("demo.topics.test", "Hello Nexus!");
+                    client.topicPublish("demo.topics.test", "This is awesome!");
+                    client.topicPublish("demo.topics.test", "Looking forward to see you again!");
+
+                    System.out.println("Publish done!");
+
+                    try {
+                        t1.join();
+                        t2.join();
+                        t3.join();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } finally {
+                        client.close();
+                        System.out.println("Bye!");
+                    }
                 }
 
             });
@@ -65,15 +71,20 @@ public class TopicsExample {
 
             NexusClient client = new NexusClient(uri);
 
-            client.login("root", "root", (r) -> {
-                client.pipeCreate(1, (pipe) -> {
-                    System.out.println(prefix + ": Pipe created. Subscribing...");
-                    client.topicSubscribe(pipe, "demo.topics.test");
-
-                    fetchMessages(pipe, prefix, 30000);
-
+            client.login("root", "root", (r, errorLogin) -> {
+                if (errorLogin != null) {
+                    System.err.println("Error in login: " + errorLogin.toString());
                     client.close();
-                });
+                } else {
+                    client.pipeCreate(1, (pipe) -> {
+                        System.out.println(prefix + ": Pipe created. Subscribing...");
+                        client.topicSubscribe(pipe, "demo.topics.test");
+
+                        fetchMessages(pipe, prefix, 30000);
+
+                        client.close();
+                    });
+                }
             });
 
         });
@@ -82,10 +93,8 @@ public class TopicsExample {
     }
 
     private static void fetchMessages(Pipe pipe, String prefix, int timeout) {
-        pipe.read(1, timeout, (response) -> {
+        pipe.read(1, timeout, (response, error) -> {
             System.out.println(prefix + ": " + response);
-
-//            fetchMessages(pipe, prefix, timeout);
         });
     }
 };

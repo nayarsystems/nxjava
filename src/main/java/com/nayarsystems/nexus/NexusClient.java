@@ -10,10 +10,12 @@ import com.nayarsystems.nexus.core.actions.impl.TaskActionsImpl;
 import com.nayarsystems.nexus.core.actions.impl.TopicActionsImpl;
 import com.nayarsystems.nexus.core.components.Pipe;
 import com.nayarsystems.nexus.core.components.Task;
+import com.thetransactioncompany.jsonrpc2.JSONRPC2Error;
 import net.minidev.json.JSONObject;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -50,7 +52,7 @@ public class NexusClient extends CoreClient implements TaskActions, PipeActions,
         this.pingThread.start();
     }
 
-    public void login(String user, String password, Consumer<JSONObject> cb) {
+    public void login(String user, String password, BiConsumer<JSONObject, JSONRPC2Error> cb) {
         this.exec("sys.login", ImmutableMap.of("user", user, "pass", password), cb);
     }
 
@@ -64,17 +66,17 @@ public class NexusClient extends CoreClient implements TaskActions, PipeActions,
     }
 
     @Override
-    public void pullTask(String prefix, Integer timeout, Consumer<Task> cb) {
+    public void pullTask(String prefix, Integer timeout, BiConsumer<Task, JSONRPC2Error> cb) {
         this.tasks.pullTask(prefix, timeout, cb);
     }
 
     @Override
-    public void pushTask(String method, Map<String, Object> parameters, Integer timeout, Boolean detach, Long prio, Long ttl, Consumer cb) {
+    public void pushTask(String method, Map<String, Object> parameters, Integer timeout, Boolean detach, Long prio, Long ttl, BiConsumer cb) {
         this.tasks.pushTask(method, parameters, timeout, detach, prio, ttl, cb);
     }
 
     @Override
-    public void taskList(String prefix, int limit, int skip, Consumer cb) {
+    public void taskList(String prefix, int limit, int skip, BiConsumer cb) {
         this.tasks.taskList(prefix, limit, skip, cb);
     }
 

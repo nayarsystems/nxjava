@@ -3,10 +3,11 @@ package com.nayarsystems.nexus.core.components;
 import com.google.common.collect.ImmutableMap;
 import com.nayarsystems.nexus.NexusClient;
 import com.nayarsystems.nexus.NexusError;
+import com.thetransactioncompany.jsonrpc2.JSONRPC2Error;
 import net.minidev.json.JSONObject;
 
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 public class Task {
 
@@ -74,21 +75,21 @@ public class Task {
         return user;
     }
 
-    public void sendResult(Object data, Consumer<JSONObject> cb) {
+    public void sendResult(Object data, BiConsumer<JSONObject, JSONRPC2Error> cb) {
         this.nexusClient.exec("task.result", ImmutableMap.of("taskid", this.id, "result", data), cb);
     }
 
-    public void sendError(NexusError error, String message, Object data, Consumer<JSONObject> cb) {
+    public void sendError(NexusError error, String message, Object data, BiConsumer<JSONObject, JSONRPC2Error> cb) {
         String msg = message != null ? error.getCode() + ":[" + message + "]" : null;
 
         this.nexusClient.exec("task.error", ImmutableMap.of("taskid", this.id, "code", error.getCode(), "message", msg, "data", data), cb);
     }
 
-    public void accept(Consumer<JSONObject> cb) {
+    public void accept(BiConsumer<JSONObject, JSONRPC2Error> cb) {
         this.nexusClient.exec("task.result", ImmutableMap.of("taskid", this.id, "result", null), cb);
     }
 
-    public void reject(Consumer<JSONObject> cb) {
+    public void reject(BiConsumer<JSONObject, JSONRPC2Error> cb) {
         this.nexusClient.exec("task.reject", ImmutableMap.of("taskid", this.id), cb);
     }
 }

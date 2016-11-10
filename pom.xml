@@ -99,7 +99,20 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+             </plugin>
+             <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                   <archive>
+                      <manifest>
+                         <mainClass>fully.qualified.MainClass</mainClass>
+                      </manifest>
+                   </archive>
+                   <descriptorRefs>
+                      <descriptorRef>jar-with-dependencies</descriptorRef>
+                   </descriptorRefs>
+                </configuration>
+             </plugin>
         </plugins>
     </build>
 

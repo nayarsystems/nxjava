@@ -30,7 +30,7 @@ public class PipeActionsImpl implements PipeActions {
         if (length != null) {
             params = ImmutableMap.of("len", length);
         }
-        this.client.exec("pipe.create", params, (response) -> {
+        this.client.exec("pipe.create", params, (response, error) -> {
             JSONObject json = (JSONObject) response;
             String pipeId = (String) json.get("pipeid");
 
